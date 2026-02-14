@@ -150,3 +150,47 @@ export function getAllReferences(): string[] {
 
   return Array.from(referencesSet).sort();
 }
+
+// Export all cards to JSON
+export function exportCardsToJSON(): string {
+  const cards = loadCards();
+  const exportData = {
+    version: '1.0',
+    exportedAt: new Date().toISOString(),
+    cards,
+  };
+  return JSON.stringify(exportData, null, 2);
+}
+
+// Import cards from JSON
+export function importCardsFromJSON(jsonString: string): { success: boolean; message: string; count?: number } {
+  try {
+    const data = JSON.parse(jsonString);
+
+    // Validate data structure
+    if (!data.cards || !Array.isArray(data.cards)) {
+      return { success: false, message: '無効なデータ形式: カード配列がありません' };
+    }
+
+    // Validate each card
+    for (const card of data.cards) {
+      if (!card.id || !card.title || !card.content || !card.tags || !card.references) {
+        return { success: false, message: '無効なカード形式: 必須フィールドが不足しています' };
+      }
+    }
+
+    // Save cards (replaces all existing cards)
+    saveCards(data.cards);
+
+    return {
+      success: true,
+      message: `${data.cards.length}件のカードをインポートしました`,
+      count: data.cards.length
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'JSONの解析に失敗しました'
+    };
+  }
+}

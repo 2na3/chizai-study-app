@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import type { Card, CardUpdate } from '../types/card';
 
 interface CardDetailProps {
@@ -15,6 +16,7 @@ export function CardDetail({
   onClose,
 }: CardDetailProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [editTab, setEditTab] = useState<'edit' | 'preview'>('edit');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
@@ -29,6 +31,7 @@ export function CardDetail({
       setReferences(card.references.join(', '));
       setRelatedCardIds(card.relatedCardIds.join(', '));
       setIsEditing(false);
+      setEditTab('edit');
     }
   }, [card]);
 
@@ -49,6 +52,7 @@ export function CardDetail({
       relatedCardIds: relatedCardIds.split(',').map((r) => r.trim()).filter(Boolean),
     });
     setIsEditing(false);
+    setEditTab('edit');
   };
 
   const handleCancel = () => {
@@ -58,6 +62,7 @@ export function CardDetail({
     setReferences(card.references.join(', '));
     setRelatedCardIds(card.relatedCardIds.join(', '));
     setIsEditing(false);
+    setEditTab('edit');
   };
 
   const handleDelete = () => {
@@ -134,22 +139,56 @@ export function CardDetail({
 
           {/* Content */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              内容
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                内容
+              </label>
+              {isEditing && (
+                <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+                  <button
+                    type="button"
+                    onClick={() => setEditTab('edit')}
+                    className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                      editTab === 'edit'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    編集
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditTab('preview')}
+                    className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                      editTab === 'preview'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    プレビュー
+                  </button>
+                </div>
+              )}
+            </div>
             {isEditing ? (
-              <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows={10}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono font-normal"
-                placeholder="内容を入力（Markdown形式）"
-              />
+              editTab === 'edit' ? (
+                <textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  rows={10}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono font-normal"
+                  placeholder="内容を入力（Markdown形式）"
+                />
+              ) : (
+                <div className="w-full min-h-[250px] px-3 py-2 border border-gray-300 rounded-lg bg-gray-50">
+                  <div className="prose prose-slate max-w-none prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-gray-900 prose-li:text-gray-900 prose-strong:text-gray-900 prose-code:text-blue-600 prose-code:bg-blue-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-50 prose-pre:border prose-pre:border-gray-200">
+                    <ReactMarkdown>{content || '*プレビューする内容がありません*'}</ReactMarkdown>
+                  </div>
+                </div>
+              )
             ) : (
-              <div className="prose max-w-none">
-                <pre className="whitespace-pre-wrap bg-gray-50 p-4 rounded-lg text-gray-900">
-                  {card.content}
-                </pre>
+              <div className="prose prose-slate max-w-none prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-gray-900 prose-li:text-gray-900 prose-strong:text-gray-900 prose-code:text-blue-600 prose-code:bg-blue-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-50 prose-pre:border prose-pre:border-gray-200">
+                <ReactMarkdown>{card.content}</ReactMarkdown>
               </div>
             )}
           </div>

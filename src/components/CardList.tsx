@@ -1,10 +1,15 @@
 import type { Card } from '../types/card';
+import { FilterPanel } from './FilterPanel';
 
 interface CardListProps {
   cards: Card[];
   selectedCardId: string | null;
   onSelectCard: (id: string) => void;
   onDeleteCard: (id: string) => void;
+  allTags: string[];
+  selectedTags: string[];
+  onToggleTag: (tag: string) => void;
+  onClearFilters: () => void;
 }
 
 export function CardList({
@@ -12,10 +17,23 @@ export function CardList({
   selectedCardId,
   onSelectCard,
   onDeleteCard,
+  allTags,
+  selectedTags,
+  onToggleTag,
+  onClearFilters,
 }: CardListProps) {
   return (
-    <div className="h-full overflow-y-auto bg-gray-50 border-r border-gray-200">
-      <div className="p-4">
+    <div className="h-full flex flex-col bg-gray-50 border-r border-gray-200">
+      {/* Filter Panel */}
+      <FilterPanel
+        allTags={allTags}
+        selectedTags={selectedTags}
+        onToggleTag={onToggleTag}
+        onClearFilters={onClearFilters}
+      />
+
+      {/* Card List */}
+      <div className="flex-1 overflow-y-auto p-4">
         <h2 className="text-lg font-bold text-gray-800 mb-4">
           カード一覧 ({cards.length})
         </h2>
@@ -35,12 +53,9 @@ export function CardList({
                     : 'bg-white border border-gray-200 hover:bg-gray-100'
                 }`}
               >
-                <h3 className="font-semibold text-gray-900 mb-1">
+                <h3 className="font-semibold text-gray-900 mb-2">
                   {card.title || '（タイトルなし）'}
                 </h3>
-                <p className="text-sm text-gray-600 line-clamp-2">
-                  {card.content || '（内容なし）'}
-                </p>
                 {card.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {card.tags.map((tag, index) => (
