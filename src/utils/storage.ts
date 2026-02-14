@@ -165,9 +165,8 @@ export function filterCardsByReference(reference: string): Card[] {
   return cards.filter((card) => card.references.includes(reference));
 }
 
-// Get all unique tags
-export function getAllTags(): string[] {
-  const cards = loadCards();
+// Get all unique tags from cards array
+export function extractTags(cards: Card[]): string[] {
   const tagsSet = new Set<string>();
 
   cards.forEach((card) => {
@@ -177,9 +176,8 @@ export function getAllTags(): string[] {
   return Array.from(tagsSet).sort();
 }
 
-// Get all unique references
-export function getAllReferences(): string[] {
-  const cards = loadCards();
+// Get all unique references from cards array
+export function extractReferences(cards: Card[]): string[] {
   const referencesSet = new Set<string>();
 
   cards.forEach((card) => {
@@ -187,6 +185,18 @@ export function getAllReferences(): string[] {
   });
 
   return Array.from(referencesSet).sort();
+}
+
+// Get all unique tags (legacy - uses localStorage)
+export function getAllTags(): string[] {
+  const cards = loadCards();
+  return extractTags(cards);
+}
+
+// Get all unique references (legacy - uses localStorage)
+export function getAllReferences(): string[] {
+  const cards = loadCards();
+  return extractReferences(cards);
 }
 
 // Export all cards to JSON

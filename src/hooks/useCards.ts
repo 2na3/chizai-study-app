@@ -12,8 +12,8 @@ export function useCards() {
     const loadData = async () => {
       const loadedCards = await storage.loadCardsAsync();
       setCards(loadedCards);
-      setAllTags(storage.getAllTags());
-      setAllReferences(storage.getAllReferences());
+      setAllTags(storage.extractTags(loadedCards));
+      setAllReferences(storage.extractReferences(loadedCards));
     };
     loadData();
   }, []);
