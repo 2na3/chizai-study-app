@@ -1,6 +1,45 @@
-# React + TypeScript + Vite
+# ChizaiLog
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+知財知識の記録・蓄積アプリ
+
+ChizaiLogは、知的財産法の学習を支援するカード型知識管理Webアプリケーションです。Zettelkasten方式を採用し、知識の関連性を可視化します。
+
+## 特徴
+
+- **カードベースの知識管理**: Zettelkasten方式で知識を整理
+- **Markdownサポート**: 見やすい記法で内容を記述
+- **タグフィルタリング**: 効率的な検索と絞り込み
+- **データエクスポート/インポート**: JSONファイルでバックアップ可能
+- **レスポンシブデザイン**: PC・タブレット・モバイルに対応
+
+## 使い方
+
+### ローカルで編集（フル機能版）
+
+```bash
+# インストール
+pnpm install
+
+# 開発サーバー起動
+pnpm dev
+
+# http://localhost:5173 でアクセス
+```
+
+### データのエクスポート
+
+1. アプリのヘッダーにあるフォルダアイコンをクリック
+2. 「データをエクスポート」をクリック
+3. JSONファイルがダウンロードされる
+
+### 閲覧専用サイトへのデプロイ
+
+1. エクスポートしたJSONファイルを`public/data.json`に配置
+2. GitHubにpush
+3. GitHub Actionsが自動的にビルド＆デプロイ
+4. `https://<username>.github.io/chizai-study-app/`で閲覧可能
+
+## Tech Stack
 
 Currently, two official plugins are available:
 

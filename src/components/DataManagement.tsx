@@ -76,7 +76,7 @@ export function DataManagement({ onClose, onImportComplete }: DataManagementProp
           <div
             className={`mb-4 p-3 rounded-lg ${
               message.type === 'success'
-                ? 'bg-green-50 text-green-700 border border-green-200'
+                ? 'bg-accent-50 text-accent-700 border border-accent-200'
                 : 'bg-red-50 text-red-700 border border-red-200'
             }`}
           >
@@ -92,7 +92,7 @@ export function DataManagement({ onClose, onImportComplete }: DataManagementProp
           </p>
           <button
             onClick={handleExport}
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            className="w-full px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
           >
             データをエクスポート
           </button>
@@ -107,7 +107,7 @@ export function DataManagement({ onClose, onImportComplete }: DataManagementProp
           </p>
           <button
             onClick={handleImportClick}
-            className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+            className="w-full px-4 py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-colors font-medium"
           >
             ファイルを選択してインポート
           </button>

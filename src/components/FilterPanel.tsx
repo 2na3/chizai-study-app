@@ -27,7 +27,7 @@ export function FilterPanel({
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-gray-700">フィルター</span>
           {hasActiveFilters && (
-            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
+            <span className="px-2 py-0.5 bg-primary-100 text-primary-700 text-xs rounded-full font-medium">
               {selectedTags.length}
             </span>
           )}
@@ -69,7 +69,7 @@ export function FilterPanel({
                       onClick={() => onToggleTag(tag)}
                       className={`px-3 py-1 text-sm rounded-full font-medium transition-colors ${
                         isSelected
-                          ? 'bg-blue-500 text-white'
+                          ? 'bg-primary-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >

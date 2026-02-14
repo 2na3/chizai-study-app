@@ -72,7 +72,7 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="例: 特許権の存続期間"
               />
             </div>
@@ -89,7 +89,7 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
                     onClick={() => setEditTab('edit')}
                     className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
                       editTab === 'edit'
-                        ? 'bg-white text-blue-600 shadow-sm'
+                        ? 'bg-white text-primary-600 shadow-sm'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
@@ -100,7 +100,7 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
                     onClick={() => setEditTab('preview')}
                     className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
                       editTab === 'preview'
-                        ? 'bg-white text-blue-600 shadow-sm'
+                        ? 'bg-white text-primary-600 shadow-sm'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
@@ -115,7 +115,7 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
                     onChange={(e) => setContent(e.target.value)}
                     required
                     rows={8}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono font-normal"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 font-mono font-normal"
                     placeholder="例:&#10;出願日から20年間&#10;（医薬品等は延長登録により最大5年延長可能）&#10;&#10;参考条文: 特許法第67条"
                   />
                   <p className="mt-1 text-sm text-gray-500">
@@ -124,7 +124,7 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
                 </>
               ) : (
                 <div className="w-full min-h-[200px] px-3 py-2 border border-gray-300 rounded-lg bg-gray-50">
-                  <div className="prose prose-slate max-w-none prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-gray-900 prose-li:text-gray-900 prose-strong:text-gray-900 prose-code:text-blue-600 prose-code:bg-blue-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-50 prose-pre:border prose-pre:border-gray-200">
+                  <div className="prose prose-slate max-w-none prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-gray-900 prose-li:text-gray-900 prose-strong:text-gray-900 prose-code:text-primary-600 prose-code:bg-primary-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-50 prose-pre:border prose-pre:border-gray-200">
                     <ReactMarkdown>{content || '*プレビューする内容がありません*'}</ReactMarkdown>
                   </div>
                 </div>
@@ -140,7 +140,7 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
                 type="text"
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="例: 特許法, 存続期間, 延長登録"
               />
               <p className="mt-1 text-sm text-gray-500">
@@ -157,7 +157,7 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
                 type="text"
                 value={references}
                 onChange={(e) => setReferences(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="例: 特許法 第67条, 知財検定3級 問3-1, テキスト p.127"
               />
               <p className="mt-1 text-sm text-gray-500">
@@ -178,7 +178,7 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
               {/* Submit: Filled Button (Material Design) */}
               <button
                 type="submit"
-                className="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm font-medium"
+                className="px-6 py-2 text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-sm font-medium"
               >
                 作成
               </button>

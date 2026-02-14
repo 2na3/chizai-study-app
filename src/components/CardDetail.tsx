@@ -7,6 +7,7 @@ interface CardDetailProps {
   onUpdateCard: (id: string, updates: CardUpdate) => void;
   onDeleteCard: (id: string) => void;
   onClose?: () => void;
+  readOnly?: boolean;
 }
 
 export function CardDetail({
@@ -14,6 +15,7 @@ export function CardDetail({
   onUpdateCard,
   onDeleteCard,
   onClose,
+  readOnly = false,
 }: CardDetailProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTab, setEditTab] = useState<'edit' | 'preview'>('edit');
@@ -37,7 +39,7 @@ export function CardDetail({
 
   if (!card) {
     return (
-      <div className="h-full flex items-center justify-center bg-gray-50">
+      <div className="h-full flex items-center justify-center bg-surface-light-variant">
         <p className="text-gray-500">カードを選択してください</p>
       </div>
     );
@@ -78,43 +80,45 @@ export function CardDetail({
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-800">カード詳細</h2>
-          <div className="flex gap-2">
-            {isEditing ? (
-              <>
-                {/* Cancel: Text Button (Material Design) */}
-                <button
-                  onClick={handleCancel}
-                  className="px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
-                >
-                  キャンセル
-                </button>
-                {/* Save: Filled Button (Material Design) */}
-                <button
-                  onClick={handleSave}
-                  className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm font-medium"
-                >
-                  保存
-                </button>
-              </>
-            ) : (
-              <>
-                {/* Edit: Filled Button (Material Design) */}
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm font-medium"
-                >
-                  編集
-                </button>
-                {/* Delete: Text Button with danger color (Material Design) */}
-                <button
-                  onClick={handleDelete}
-                  className="px-4 py-2 text-red-600 rounded-lg hover:bg-red-50 transition-colors font-medium"
-                >
-                  削除
-                </button>
-              </>
-            )}
-          </div>
+          {!readOnly && (
+            <div className="flex gap-2">
+              {isEditing ? (
+                <>
+                  {/* Cancel: Text Button (Material Design) */}
+                  <button
+                    onClick={handleCancel}
+                    className="px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+                  >
+                    キャンセル
+                  </button>
+                  {/* Save: Filled Button (Material Design) */}
+                  <button
+                    onClick={handleSave}
+                    className="px-4 py-2 text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-sm font-medium"
+                  >
+                    保存
+                  </button>
+                </>
+              ) : (
+                <>
+                  {/* Edit: Filled Button (Material Design) */}
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="px-4 py-2 text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-sm font-medium"
+                  >
+                    編集
+                  </button>
+                  {/* Delete: Text Button with danger color (Material Design) */}
+                  <button
+                    onClick={handleDelete}
+                    className="px-4 py-2 text-red-600 rounded-lg hover:bg-red-50 transition-colors font-medium"
+                  >
+                    削除
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Content */}
@@ -129,7 +133,7 @@ export function CardDetail({
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="タイトルを入力"
               />
             ) : (
@@ -150,7 +154,7 @@ export function CardDetail({
                     onClick={() => setEditTab('edit')}
                     className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
                       editTab === 'edit'
-                        ? 'bg-white text-blue-600 shadow-sm'
+                        ? 'bg-white text-primary-600 shadow-sm'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
@@ -161,7 +165,7 @@ export function CardDetail({
                     onClick={() => setEditTab('preview')}
                     className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
                       editTab === 'preview'
-                        ? 'bg-white text-blue-600 shadow-sm'
+                        ? 'bg-white text-primary-600 shadow-sm'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
@@ -176,18 +180,18 @@ export function CardDetail({
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   rows={10}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono font-normal"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 font-mono font-normal"
                   placeholder="内容を入力（Markdown形式）"
                 />
               ) : (
                 <div className="w-full min-h-[250px] px-3 py-2 border border-gray-300 rounded-lg bg-gray-50">
-                  <div className="prose prose-slate max-w-none prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-gray-900 prose-li:text-gray-900 prose-strong:text-gray-900 prose-code:text-blue-600 prose-code:bg-blue-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-50 prose-pre:border prose-pre:border-gray-200">
+                  <div className="prose prose-slate max-w-none prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-gray-900 prose-li:text-gray-900 prose-strong:text-gray-900 prose-code:text-primary-600 prose-code:bg-primary-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-50 prose-pre:border prose-pre:border-gray-200">
                     <ReactMarkdown>{content || '*プレビューする内容がありません*'}</ReactMarkdown>
                   </div>
                 </div>
               )
             ) : (
-              <div className="prose prose-slate max-w-none prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-gray-900 prose-li:text-gray-900 prose-strong:text-gray-900 prose-code:text-blue-600 prose-code:bg-blue-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-50 prose-pre:border prose-pre:border-gray-200">
+              <div className="prose prose-slate max-w-none prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-gray-900 prose-li:text-gray-900 prose-strong:text-gray-900 prose-code:text-primary-600 prose-code:bg-primary-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-50 prose-pre:border prose-pre:border-gray-200">
                 <ReactMarkdown>{card.content}</ReactMarkdown>
               </div>
             )}
@@ -203,7 +207,7 @@ export function CardDetail({
                 type="text"
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="タグをカンマ区切りで入力（例: 特許法, 商標法）"
               />
             ) : card.tags.length > 0 ? (
@@ -211,7 +215,7 @@ export function CardDetail({
                 {card.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-medium text-sm"
+                    className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full font-medium text-sm"
                   >
                     {tag}
                   </span>
@@ -232,7 +236,7 @@ export function CardDetail({
                 type="text"
                 value={references}
                 onChange={(e) => setReferences(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="例: 特許法 第67条, 知財検定3級 問3-1, テキスト p.127"
               />
             ) : card.references.length > 0 ? (
@@ -240,7 +244,7 @@ export function CardDetail({
                 {card.references.map((ref, index) => (
                   <span
                     key={index}
-                    className="px-3 py-1 bg-green-100 text-green-700 rounded-full font-medium text-sm"
+                    className="px-3 py-1 bg-accent-100 text-accent-700 rounded-full font-medium text-sm"
                   >
                     {ref}
                   </span>
@@ -261,7 +265,7 @@ export function CardDetail({
                 type="text"
                 value={relatedCardIds}
                 onChange={(e) => setRelatedCardIds(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 placeholder="関連カードIDをカンマ区切りで入力"
               />
             ) : card.relatedCardIds.length > 0 ? (

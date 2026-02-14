@@ -23,7 +23,7 @@ export function CardList({
   onClearFilters,
 }: CardListProps) {
   return (
-    <div className="h-full flex flex-col bg-gray-50 border-r border-gray-200">
+    <div className="h-full flex flex-col bg-surface-light-variant border-r border-gray-200">
       {/* Filter Panel */}
       <FilterPanel
         allTags={allTags}
@@ -49,8 +49,8 @@ export function CardList({
                 onClick={() => onSelectCard(card.id)}
                 className={`p-3 rounded-lg cursor-pointer transition-colors ${
                   selectedCardId === card.id
-                    ? 'bg-blue-100 border-2 border-blue-500'
-                    : 'bg-white border border-gray-200 hover:bg-gray-100'
+                    ? 'bg-primary-50 border-2 border-primary-500'
+                    : 'bg-white border border-gray-200 hover:bg-gray-50'
                 }`}
               >
                 <h3 className="font-semibold text-gray-900 mb-2">
@@ -61,7 +61,7 @@ export function CardList({
                     {card.tags.map((tag, index) => (
                       <span
                         key={index}
-                        className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-medium"
+                        className="px-2 py-0.5 bg-primary-100 text-primary-700 text-xs rounded font-medium"
                       >
                         {tag}
                       </span>

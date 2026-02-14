@@ -1,5 +1,6 @@
 {
-  "name": "chizai-study-app",
+  "name": "chizailog",
+  "description": "ChizaiLog - 知財知識の記録・蓄積アプリ",
   "private": true,
   "version": "0.0.0",
   "type": "module",

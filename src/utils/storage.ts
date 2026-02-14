@@ -1,4 +1,5 @@
 import type { Card, CardInput, CardUpdate } from '../types/card';
+import { isReadOnlyMode } from './env';
 
 const STORAGE_KEY = 'chizai-study-cards';
 
@@ -7,7 +8,46 @@ function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
-// Load all cards from localStorage
+// Load all cards from localStorage or static JSON (in read-only mode)
+export async function loadCardsAsync(): Promise<Card[]> {
+  try {
+    // In read-only mode, load from static JSON file
+    if (isReadOnlyMode()) {
+      const response = await fetch('/data.json');
+      if (!response.ok) {
+        console.error('Failed to fetch data.json');
+        return [];
+      }
+      const data = await response.json();
+      return data.cards || [];
+    }
+
+    // Normal mode: load from localStorage
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (!data) return [];
+    const cards = JSON.parse(data) as Card[];
+
+    // Migrate old data: problemNumbers -> references
+    return cards.map((card) => {
+      // @ts-expect-error: handling legacy data structure
+      if (card.problemNumbers && !card.references) {
+        return {
+          ...card,
+          // @ts-expect-error: handling legacy data structure
+          references: card.problemNumbers,
+          // @ts-expect-error: removing old field
+          problemNumbers: undefined,
+        };
+      }
+      return card;
+    });
+  } catch (error) {
+    console.error('Failed to load cards:', error);
+    return [];
+  }
+}
+
+// Synchronous version for backward compatibility
 export function loadCards(): Card[] {
   try {
     const data = localStorage.getItem(STORAGE_KEY);

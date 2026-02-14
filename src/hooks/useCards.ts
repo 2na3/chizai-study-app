@@ -9,10 +9,13 @@ export function useCards() {
 
   // Load cards on mount
   useEffect(() => {
-    const loadedCards = storage.loadCards();
-    setCards(loadedCards);
-    setAllTags(storage.getAllTags());
-    setAllReferences(storage.getAllReferences());
+    const loadData = async () => {
+      const loadedCards = await storage.loadCardsAsync();
+      setCards(loadedCards);
+      setAllTags(storage.getAllTags());
+      setAllReferences(storage.getAllReferences());
+    };
+    loadData();
   }, []);
 
   // Add a new card
