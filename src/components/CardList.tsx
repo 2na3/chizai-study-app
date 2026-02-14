@@ -16,7 +16,7 @@ export function CardList({
   cards,
   selectedCardId,
   onSelectCard,
-  onDeleteCard,
+  onDeleteCard: _onDeleteCard,
   allTags,
   selectedTags,
   onToggleTag,

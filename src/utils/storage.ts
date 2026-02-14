@@ -35,8 +35,6 @@ export async function loadCardsAsync(): Promise<Card[]> {
           ...card,
           // @ts-expect-error: handling legacy data structure
           references: card.problemNumbers,
-          // @ts-expect-error: removing old field
-          problemNumbers: undefined,
         };
       }
       return card;
@@ -62,8 +60,6 @@ export function loadCards(): Card[] {
           ...card,
           // @ts-expect-error: handling legacy data structure
           references: card.problemNumbers,
-          // @ts-expect-error: removing old field
-          problemNumbers: undefined,
         };
       }
       return card;
