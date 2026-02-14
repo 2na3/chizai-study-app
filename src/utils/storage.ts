@@ -190,9 +190,15 @@ export function getAllReferences(): string[] {
 // Export all cards to JSON
 export function exportCardsToJSON(): string {
   const cards = loadCards();
+
+  // Generate JST timestamp
+  const now = new Date();
+  const jstDate = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
+  const exportedAt = jstDate.toISOString();
+
   const exportData = {
     version: '1.0',
-    exportedAt: new Date().toISOString(),
+    exportedAt,
     cards,
   };
   return JSON.stringify(exportData, null, 2);

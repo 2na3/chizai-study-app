@@ -17,14 +17,23 @@ export function DataManagement({ onClose, onImportComplete }: DataManagementProp
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `chizai-cards-${new Date().toISOString().split('T')[0]}.json`;
+
+      // Generate JST date string (YYYY-MM-DD)
+      const now = new Date();
+      const jstDate = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
+      const year = jstDate.getFullYear();
+      const month = String(jstDate.getMonth() + 1).padStart(2, '0');
+      const day = String(jstDate.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+
+      link.download = `chizai-cards-${dateStr}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
       setMessage({ type: 'success', text: 'データをエクスポートしました' });
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'エクスポートに失敗しました' });
     }
   };
@@ -47,7 +56,7 @@ export function DataManagement({ onClose, onImportComplete }: DataManagementProp
       } else {
         setMessage({ type: 'error', text: result.message });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'ファイルの読み込みに失敗しました' });
     }
 
