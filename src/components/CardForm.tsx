@@ -1,0 +1,152 @@
+import { useState, useEffect } from 'react';
+import type { CardInput } from '../types/card';
+
+interface CardFormProps {
+  onSubmit: (input: CardInput) => void;
+  onCancel: () => void;
+}
+
+export function CardForm({ onSubmit, onCancel }: CardFormProps) {
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [tags, setTags] = useState('');
+  const [references, setReferences] = useState('');
+
+  // Handle Esc key to close modal
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onCancel();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onCancel]);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    onSubmit({
+      title,
+      content,
+      tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
+      references: references.split(',').map((r) => r.trim()).filter(Boolean),
+      relatedCardIds: [],
+    });
+
+    // Reset form
+    setTitle('');
+    setContent('');
+    setTags('');
+    setReferences('');
+  };
+
+  // Handle click on backdrop to close modal
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      onCancel();
+    }
+  };
+
+  return (
+    <div
+      onClick={handleBackdropClick}
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    >
+      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">新規カード作成</h2>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Title */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                タイトル <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="例: 特許権の存続期間"
+              />
+            </div>
+
+            {/* Content */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                内容 <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                required
+                rows={8}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono font-normal"
+                placeholder="例:&#10;出願日から20年間&#10;（医薬品等は延長登録により最大5年延長可能）&#10;&#10;参考条文: 特許法第67条"
+              />
+              <p className="mt-1 text-sm text-gray-500">
+                Markdown形式で記述できます
+              </p>
+            </div>
+
+            {/* Tags */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                タグ
+              </label>
+              <input
+                type="text"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="例: 特許法, 存続期間, 延長登録"
+              />
+              <p className="mt-1 text-sm text-gray-500">
+                カンマ区切りで複数指定できます
+              </p>
+            </div>
+
+            {/* References */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                参照
+              </label>
+              <input
+                type="text"
+                value={references}
+                onChange={(e) => setReferences(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="例: 特許法 第67条, 知財検定3級 問3-1, テキスト p.127"
+              />
+              <p className="mt-1 text-sm text-gray-500">
+                法律条文、問題番号、テキストページなどをカンマ区切りで指定
+              </p>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-end gap-3 pt-4">
+              {/* Cancel: Text Button (Material Design) */}
+              <button
+                type="button"
+                onClick={onCancel}
+                className="px-6 py-2 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+              >
+                キャンセル
+              </button>
+              {/* Submit: Filled Button (Material Design) */}
+              <button
+                type="submit"
+                className="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm font-medium"
+              >
+                作成
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
