@@ -13,9 +13,11 @@ export async function loadCardsAsync(): Promise<Card[]> {
   try {
     // In read-only mode, load from static JSON file
     if (isReadOnlyMode()) {
-      const response = await fetch('/data.json');
+      const basePath = import.meta.env.BASE_URL || '/';
+      const dataUrl = `${basePath}data.json`;
+      const response = await fetch(dataUrl);
       if (!response.ok) {
-        console.error('Failed to fetch data.json');
+        console.error(`Failed to fetch ${dataUrl}:`, response.status);
         return [];
       }
       const data = await response.json();
