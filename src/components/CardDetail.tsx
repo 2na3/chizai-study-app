@@ -100,58 +100,60 @@ export function CardDetail({
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-800">カード詳細</h2>
-          {!readOnly && (
-            <div className="flex gap-2">
-              {isEditing ? (
-                <>
-                  {/* Cancel: Text Button (Material Design) */}
-                  <button
-                    onClick={handleCancel}
-                    className="px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
-                  >
-                    キャンセル
-                  </button>
-                  {/* Save: Filled Button (Material Design) */}
-                  <button
-                    onClick={handleSave}
-                    className="px-4 py-2 text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-sm font-medium"
-                  >
-                    保存
-                  </button>
-                </>
-              ) : (
-                <>
-                  {/* Show in Graph: Text Button (Material Design) */}
-                  {onShowInGraph && (
+          <div className="flex gap-2">
+            {/* Show in Graph: Text Button (always visible) */}
+            {onShowInGraph && (
+              <button
+                onClick={() => onShowInGraph(card.id)}
+                className="px-4 py-2 text-accent-600 rounded-lg hover:bg-accent-50 transition-colors font-medium flex items-center gap-1"
+                title="このカードを中心としたグラフを表示"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                グラフ表示
+              </button>
+            )}
+            {!readOnly && (
+              <>
+                {isEditing ? (
+                  <>
+                    {/* Cancel: Text Button (Material Design) */}
                     <button
-                      onClick={() => onShowInGraph(card.id)}
-                      className="px-4 py-2 text-accent-600 rounded-lg hover:bg-accent-50 transition-colors font-medium flex items-center gap-1"
-                      title="このカードを中心としたグラフを表示"
+                      onClick={handleCancel}
+                      className="px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                      </svg>
-                      グラフ表示
+                      キャンセル
                     </button>
-                  )}
-                  {/* Edit: Filled Button (Material Design) */}
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="px-4 py-2 text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-sm font-medium"
-                  >
-                    編集
-                  </button>
-                  {/* Delete: Text Button with danger color (Material Design) */}
-                  <button
-                    onClick={handleDelete}
-                    className="px-4 py-2 text-red-600 rounded-lg hover:bg-red-50 transition-colors font-medium"
-                  >
-                    削除
-                  </button>
-                </>
-              )}
-            </div>
-          )}
+                    {/* Save: Filled Button (Material Design) */}
+                    <button
+                      onClick={handleSave}
+                      className="px-4 py-2 text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-sm font-medium"
+                    >
+                      保存
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {/* Edit: Filled Button (Material Design) */}
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="px-4 py-2 text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-sm font-medium"
+                    >
+                      編集
+                    </button>
+                    {/* Delete: Text Button with danger color (Material Design) */}
+                    <button
+                      onClick={handleDelete}
+                      className="px-4 py-2 text-red-600 rounded-lg hover:bg-red-50 transition-colors font-medium"
+                    >
+                      削除
+                    </button>
+                  </>
+                )}
+              </>
+            )}
+          </div>
         </div>
 
         {/* Content */}
