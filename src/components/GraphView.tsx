@@ -225,12 +225,29 @@ export function GraphView({ cards, onNodeClick, initialCenterNodeId }: GraphView
         </div>
 
         {/* 統計情報 */}
-        <div className="text-sm text-gray-600">
-          {graphData.nodes.length}個のカード、{graphData.links.length}個の関連性
+        <div className="text-sm text-gray-600 flex items-center gap-2 flex-wrap">
+          <span>
+            {graphData.nodes.length}個のカード、{graphData.links.length}個の関連性
+            {centerNodeId && (
+              <span className="ml-2 text-primary-600 font-medium">
+                （中心: {cards.find((c) => c.id === centerNodeId)?.title}）
+              </span>
+            )}
+          </span>
           {centerNodeId && (
-            <span className="ml-2 text-primary-600 font-medium">
-              （中心: {cards.find((c) => c.id === centerNodeId)?.title}）
-            </span>
+            <button
+              onClick={() => {
+                setCenterNodeId(null);
+                setMaxDistance(null);
+              }}
+              className="px-2 py-1 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors flex items-center gap-1"
+              title="中心を解除"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              中心を解除
+            </button>
           )}
         </div>
       </div>
