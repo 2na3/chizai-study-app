@@ -34,79 +34,23 @@ pnpm dev
 
 ### 閲覧専用サイトへのデプロイ
 
-1. エクスポートしたJSONファイルを`public/data.json`に配置
-2. GitHubにpush
-3. GitHub Actionsが自動的にビルド＆デプロイ
-4. `https://<username>.github.io/chizai-study-app/`で閲覧可能
+1. ローカルでデータをエクスポート（例: `chizai-cards-2026-02-15.json`）
+2. エクスポートしたファイルを **そのまま** `data/exports/` ディレクトリに配置
+3. GitHubにコミット＆プッシュ
+4. GitHub Actionsが自動的に以下を実行:
+   - 最新のエクスポートファイルを検出
+   - `public/data.json` にコピー
+   - ビルド＆デプロイ
+5. `https://<username>.github.io/chizai-study-app/` で閲覧可能
+
+**メリット**: ファイルのリネームや手動コピーが不要。過去のエクスポートファイルも履歴として残る。
 
 ## Tech Stack
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **React 19** - UIライブラリ
+- **TypeScript** - 型安全性
+- **Vite** - ビルドツール
+- **TailwindCSS** - スタイリング（カスタムカラーパレット）
+- **react-markdown** - Markdownレンダリング
+- **LocalStorage** - ローカルデータ永続化
+- **GitHub Pages** - 静的サイトホスティング

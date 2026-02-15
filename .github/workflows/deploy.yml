@@ -36,6 +36,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Copy latest export to public/data.json
+        run: |
+          # Find the latest export file in data/exports/
+          LATEST_EXPORT=$(ls -t data/exports/chizai-cards-*.json 2>/dev/null | head -n 1)
+
+          if [ -n "$LATEST_EXPORT" ]; then
+            cp "$LATEST_EXPORT" public/data.json
+            echo "✓ Copied $LATEST_EXPORT to public/data.json"
+          else
+            echo "⚠ No export files found in data/exports/, using existing public/data.json"
+          fi
+
       - name: Build with read-only mode
         run: pnpm build
         env:
