@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import type { Card, CardUpdate } from '../types/card';
+import { TagSelector } from './TagSelector';
+import { getAllTags, getTagColorClasses, getCategoryForTag } from '../constants/tags';
 
 interface CardDetailProps {
   card: Card | null;
@@ -23,7 +25,8 @@ export function CardDetail({
   const [editTab, setEditTab] = useState<'edit' | 'preview'>('edit');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [tags, setTags] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [customTags, setCustomTags] = useState<string[]>([]);
   const [references, setReferences] = useState('');
   const [relatedCardIds, setRelatedCardIds] = useState('');
 
@@ -31,7 +34,14 @@ export function CardDetail({
     if (card) {
       setTitle(card.title);
       setContent(card.content);
-      setTags(card.tags.join(', '));
+
+      // Separate predefined tags from custom tags
+      const allPredefinedTags = getAllTags();
+      const predefinedTags = card.tags.filter((tag) => allPredefinedTags.includes(tag));
+      const customTagsList = card.tags.filter((tag) => !allPredefinedTags.includes(tag));
+
+      setSelectedTags(predefinedTags);
+      setCustomTags(customTagsList);
       setReferences(card.references.join(', '));
       setRelatedCardIds(card.relatedCardIds.join(', '));
       setIsEditing(false);
@@ -51,7 +61,7 @@ export function CardDetail({
     onUpdateCard(card.id, {
       title,
       content,
-      tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
+      tags: [...selectedTags, ...customTags],
       references: references.split(',').map((r) => r.trim()).filter(Boolean),
       relatedCardIds: relatedCardIds.split(',').map((r) => r.trim()).filter(Boolean),
     });
@@ -59,12 +69,35 @@ export function CardDetail({
     setEditTab('edit');
   };
 
+  // Tag selection handlers
+  const handleTagToggle = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  };
+
+  const handleCustomTagAdd = (tag: string) => {
+    const allPredefinedTags = getAllTags();
+    if (!allPredefinedTags.includes(tag)) {
+      setCustomTags((prev) => [...prev, tag]);
+      setSelectedTags((prev) => [...prev, tag]);
+    }
+  };
+
+  const handleCustomTagRemove = (tag: string) => {
+    setCustomTags((prev) => prev.filter((t) => t !== tag));
+    setSelectedTags((prev) => prev.filter((t) => t !== tag));
+  };
+
   // 編集内容に変更があるかチェック
   const hasChanges = () => {
+    const currentTags = [...selectedTags, ...customTags].sort();
+    const originalTags = [...card.tags].sort();
+
     return (
       title !== card.title ||
       content !== card.content ||
-      tags !== card.tags.join(', ') ||
+      JSON.stringify(currentTags) !== JSON.stringify(originalTags) ||
       references !== card.references.join(', ') ||
       relatedCardIds !== card.relatedCardIds.join(', ')
     );
@@ -75,7 +108,14 @@ export function CardDetail({
       if (window.confirm('編集内容は保存されていません、破棄してもよろしいでしょうか')) {
         setTitle(card.title);
         setContent(card.content);
-        setTags(card.tags.join(', '));
+
+        // Reset tags to original
+        const allPredefinedTags = getAllTags();
+        const predefinedTags = card.tags.filter((tag) => allPredefinedTags.includes(tag));
+        const customTagsList = card.tags.filter((tag) => !allPredefinedTags.includes(tag));
+        setSelectedTags(predefinedTags);
+        setCustomTags(customTagsList);
+
         setReferences(card.references.join(', '));
         setRelatedCardIds(card.relatedCardIds.join(', '));
         setIsEditing(false);
@@ -234,27 +274,36 @@ export function CardDetail({
 
           {/* Tags */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-gray-700 mb-3">
               タグ
             </label>
             {isEditing ? (
-              <input
-                type="text"
-                value={tags}
-                onChange={(e) => setTags(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="タグをカンマ区切りで入力（例: 特許法, 商標法）"
+              <TagSelector
+                selectedTags={selectedTags}
+                onTagToggle={handleTagToggle}
+                customTags={customTags}
+                onCustomTagAdd={handleCustomTagAdd}
+                onCustomTagRemove={handleCustomTagRemove}
               />
             ) : card.tags.length > 0 ? (
               <div className="flex flex-wrap gap-2">
-                {card.tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full font-medium text-sm"
-                  >
-                    {tag}
-                  </span>
-                ))}
+                {card.tags.map((tag, index) => {
+                  const categoryKey = getCategoryForTag(tag);
+                  const isCustomTag = !categoryKey;
+
+                  return (
+                    <span
+                      key={index}
+                      className={`px-3 py-1.5 rounded-full font-medium text-sm border-2 ${
+                        isCustomTag
+                          ? 'bg-gray-100 text-gray-800 border-gray-300'
+                          : getTagColorClasses(tag, true)
+                      }`}
+                    >
+                      {tag}
+                    </span>
+                  );
+                })}
               </div>
             ) : (
               <p className="text-gray-500 text-sm">なし</p>

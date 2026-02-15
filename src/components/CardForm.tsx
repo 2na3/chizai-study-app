@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import type { CardInput } from '../types/card';
+import { TagSelector } from './TagSelector';
+import { getAllTags } from '../constants/tags';
 
 interface CardFormProps {
   onSubmit: (input: CardInput) => void;
@@ -11,12 +13,19 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
   const [editTab, setEditTab] = useState<'edit' | 'preview'>('edit');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [tags, setTags] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [customTags, setCustomTags] = useState<string[]>([]);
   const [references, setReferences] = useState('');
 
   // 入力内容があるかチェック
   const hasInput = () => {
-    return title.trim() !== '' || content.trim() !== '' || tags.trim() !== '' || references.trim() !== '';
+    return (
+      title.trim() !== '' ||
+      content.trim() !== '' ||
+      selectedTags.length > 0 ||
+      customTags.length > 0 ||
+      references.trim() !== ''
+    );
   };
 
   // キャンセル処理（入力内容がある場合は確認）
@@ -40,7 +49,7 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [title, content, tags, references]);
+  }, [title, content, selectedTags, customTags, references]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -48,7 +57,7 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
     onSubmit({
       title,
       content,
-      tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
+      tags: [...selectedTags, ...customTags],
       references: references.split(',').map((r) => r.trim()).filter(Boolean),
       relatedCardIds: [],
     });
@@ -56,9 +65,30 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
     // Reset form
     setTitle('');
     setContent('');
-    setTags('');
+    setSelectedTags([]);
+    setCustomTags([]);
     setReferences('');
     setEditTab('edit');
+  };
+
+  // Tag selection handlers
+  const handleTagToggle = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  };
+
+  const handleCustomTagAdd = (tag: string) => {
+    const allPredefinedTags = getAllTags();
+    if (!allPredefinedTags.includes(tag)) {
+      setCustomTags((prev) => [...prev, tag]);
+      setSelectedTags((prev) => [...prev, tag]);
+    }
+  };
+
+  const handleCustomTagRemove = (tag: string) => {
+    setCustomTags((prev) => prev.filter((t) => t !== tag));
+    setSelectedTags((prev) => prev.filter((t) => t !== tag));
   };
 
   // Handle click on backdrop to close modal
@@ -149,19 +179,16 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
 
             {/* Tags */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-3">
                 タグ
               </label>
-              <input
-                type="text"
-                value={tags}
-                onChange={(e) => setTags(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="例: 特許法, 存続期間, 延長登録"
+              <TagSelector
+                selectedTags={selectedTags}
+                onTagToggle={handleTagToggle}
+                customTags={customTags}
+                onCustomTagAdd={handleCustomTagAdd}
+                onCustomTagRemove={handleCustomTagRemove}
               />
-              <p className="mt-1 text-sm text-gray-500">
-                カンマ区切りで複数指定できます
-              </p>
             </div>
 
             {/* References */}
