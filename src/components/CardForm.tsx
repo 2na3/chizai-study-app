@@ -14,17 +14,33 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
   const [tags, setTags] = useState('');
   const [references, setReferences] = useState('');
 
+  // 入力内容があるかチェック
+  const hasInput = () => {
+    return title.trim() !== '' || content.trim() !== '' || tags.trim() !== '' || references.trim() !== '';
+  };
+
+  // キャンセル処理（入力内容がある場合は確認）
+  const handleCancel = () => {
+    if (hasInput()) {
+      if (window.confirm('編集内容は保存されていません、破棄してもよろしいでしょうか？')) {
+        onCancel();
+      }
+    } else {
+      onCancel();
+    }
+  };
+
   // Handle Esc key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onCancel();
+        handleCancel();
       }
     };
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [onCancel]);
+  }, [title, content, tags, references]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -48,7 +64,7 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
   // Handle click on backdrop to close modal
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
-      onCancel();
+      handleCancel();
     }
   };
 
@@ -170,7 +186,7 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
               {/* Cancel: Text Button (Material Design) */}
               <button
                 type="button"
-                onClick={onCancel}
+                onClick={handleCancel}
                 className="px-6 py-2 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
               >
                 キャンセル
