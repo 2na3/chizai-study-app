@@ -18,15 +18,18 @@ export function DataManagement({ onClose, onImportComplete }: DataManagementProp
       const link = document.createElement('a');
       link.href = url;
 
-      // Generate JST date string (YYYY-MM-DD)
+      // Generate JST datetime string (YYYY-MM-DD-HHmmss)
       const now = new Date();
       const jstDate = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
       const year = jstDate.getFullYear();
       const month = String(jstDate.getMonth() + 1).padStart(2, '0');
       const day = String(jstDate.getDate()).padStart(2, '0');
-      const dateStr = `${year}-${month}-${day}`;
+      const hours = String(jstDate.getHours()).padStart(2, '0');
+      const minutes = String(jstDate.getMinutes()).padStart(2, '0');
+      const seconds = String(jstDate.getSeconds()).padStart(2, '0');
+      const datetimeStr = `${year}-${month}-${day}-${hours}${minutes}${seconds}`;
 
-      link.download = `chizai-cards-${dateStr}.json`;
+      link.download = `chizai-cards-${datetimeStr}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

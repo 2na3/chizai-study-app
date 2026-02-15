@@ -38,8 +38,8 @@ jobs:
 
       - name: Copy latest export to public/data.json
         run: |
-          # Find the latest export file in data/exports/
-          LATEST_EXPORT=$(ls -t data/exports/chizai-cards-*.json 2>/dev/null | head -n 1)
+          # Find the latest export file by filename (reverse alphabetical order)
+          LATEST_EXPORT=$(ls data/exports/chizai-cards-*.json 2>/dev/null | sort -r | head -n 1)
 
           if [ -n "$LATEST_EXPORT" ]; then
             cp "$LATEST_EXPORT" public/data.json
