@@ -4,17 +4,22 @@ import { CardList } from './components/CardList';
 import { CardDetail } from './components/CardDetail';
 import { CardForm } from './components/CardForm';
 import { DataManagement } from './components/DataManagement';
+import { GraphView } from './components/GraphView';
 import { isReadOnlyMode } from './utils/env';
 import type { CardInput } from './types/card';
+
+type ViewMode = 'list' | 'graph';
 
 function App() {
   const readOnly = isReadOnlyMode();
   const { cards, allTags, addCard, updateCard, deleteCard, getCard } = useCards();
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDataManagementOpen, setIsDataManagementOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [graphCenterNodeId, setGraphCenterNodeId] = useState<string | null>(null);
 
   const selectedCard = selectedCardId ? (getCard(selectedCardId) ?? null) : null;
 
@@ -62,6 +67,12 @@ function App() {
   const handleImportComplete = () => {
     // Reload the page to refresh all data
     window.location.reload();
+  };
+
+  const handleShowInGraph = (cardId: string) => {
+    setGraphCenterNodeId(cardId);
+    setViewMode('graph');
+    setSelectedCardId(cardId);
   };
 
   return (
@@ -117,13 +128,44 @@ function App() {
               <h1 className="text-xl md:text-2xl font-bold">ChizaiLog</h1>
             </div>
             <div className="flex gap-2 justify-end flex-1 min-w-0">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="タイトルやタグで検索..."
-                className="flex-1 min-w-0 max-w-96 px-3 py-2 rounded-md bg-white text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
-              />
+              {viewMode === 'list' && (
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="タイトルやタグで検索..."
+                  className="flex-1 min-w-0 max-w-96 px-3 py-2 rounded-md bg-white text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+                />
+              )}
+              {/* View Toggle Buttons */}
+              <div className="flex gap-1 bg-secondary-700 rounded-lg p-1 flex-shrink-0">
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-3 py-1.5 rounded-md transition-colors text-sm font-medium ${
+                    viewMode === 'list'
+                      ? 'bg-white text-secondary-800'
+                      : 'text-white hover:bg-secondary-600'
+                  }`}
+                  title="リストビュー"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setViewMode('graph')}
+                  className={`px-3 py-1.5 rounded-md transition-colors text-sm font-medium ${
+                    viewMode === 'graph'
+                      ? 'bg-white text-secondary-800'
+                      : 'text-white hover:bg-secondary-600'
+                  }`}
+                  title="グラフビュー"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  </svg>
+                </button>
+              </div>
               {!readOnly && (
                 <>
                   <button
@@ -160,61 +202,121 @@ function App() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-hidden">
-        {/* Desktop: Side by side layout */}
-        <div className="hidden md:grid md:grid-cols-[400px_1fr] h-full">
-          <CardList
-            cards={filteredCards}
-            selectedCardId={selectedCardId}
-            onSelectCard={setSelectedCardId}
-            onDeleteCard={handleDeleteCard}
-            allTags={allTags}
-            selectedTags={selectedTags}
-            onToggleTag={handleToggleTag}
-            onClearFilters={handleClearFilters}
-          />
-          <CardDetail
-            card={selectedCard}
-            onUpdateCard={updateCard}
-            onDeleteCard={handleDeleteCard}
-            readOnly={readOnly}
-          />
-        </div>
+        {viewMode === 'list' ? (
+          <>
+            {/* Desktop: Side by side layout */}
+            <div className="hidden md:grid md:grid-cols-[400px_1fr] h-full">
+              <CardList
+                cards={filteredCards}
+                selectedCardId={selectedCardId}
+                onSelectCard={setSelectedCardId}
+                onDeleteCard={handleDeleteCard}
+                allTags={allTags}
+                selectedTags={selectedTags}
+                onToggleTag={handleToggleTag}
+                onClearFilters={handleClearFilters}
+              />
+              <CardDetail
+                card={selectedCard}
+                onUpdateCard={updateCard}
+                onDeleteCard={handleDeleteCard}
+                onShowInGraph={handleShowInGraph}
+                readOnly={readOnly}
+              />
+            </div>
 
-        {/* Mobile: Stack layout */}
-        <div className="md:hidden h-full">
-          {selectedCardId ? (
-            <div className="h-full flex flex-col">
-              <div className="bg-white border-b border-gray-200 p-4">
-                <button
-                  onClick={() => setSelectedCardId(null)}
-                  className="text-blue-600 hover:text-blue-700 font-semibold"
-                >
-                  ← 一覧に戻る
-                </button>
+            {/* Mobile: Stack layout */}
+            <div className="md:hidden h-full">
+              {selectedCardId ? (
+                <div className="h-full flex flex-col">
+                  <div className="bg-white border-b border-gray-200 p-4">
+                    <button
+                      onClick={() => setSelectedCardId(null)}
+                      className="text-blue-600 hover:text-blue-700 font-semibold"
+                    >
+                      ← 一覧に戻る
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-hidden">
+                    <CardDetail
+                      card={selectedCard}
+                      onUpdateCard={updateCard}
+                      onDeleteCard={handleDeleteCard}
+                      onClose={() => setSelectedCardId(null)}
+                      onShowInGraph={handleShowInGraph}
+                      readOnly={readOnly}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <CardList
+                  cards={filteredCards}
+                  selectedCardId={selectedCardId}
+                  onSelectCard={setSelectedCardId}
+                  onDeleteCard={handleDeleteCard}
+                  allTags={allTags}
+                  selectedTags={selectedTags}
+                  onToggleTag={handleToggleTag}
+                  onClearFilters={handleClearFilters}
+                />
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Desktop: Graph + Detail layout */}
+            <div className="hidden md:grid md:grid-cols-[1fr_400px] h-full">
+              <div className="min-h-0">
+                <GraphView
+                  cards={cards}
+                  onNodeClick={(cardId) => setSelectedCardId(cardId)}
+                  initialCenterNodeId={graphCenterNodeId}
+                />
               </div>
-              <div className="flex-1 overflow-hidden">
+              <div className="min-h-0">
                 <CardDetail
                   card={selectedCard}
                   onUpdateCard={updateCard}
                   onDeleteCard={handleDeleteCard}
-                  onClose={() => setSelectedCardId(null)}
+                  onShowInGraph={handleShowInGraph}
                   readOnly={readOnly}
                 />
               </div>
             </div>
-          ) : (
-            <CardList
-              cards={filteredCards}
-              selectedCardId={selectedCardId}
-              onSelectCard={setSelectedCardId}
-              onDeleteCard={handleDeleteCard}
-              allTags={allTags}
-              selectedTags={selectedTags}
-              onToggleTag={handleToggleTag}
-              onClearFilters={handleClearFilters}
-            />
-          )}
-        </div>
+
+            {/* Mobile: Graph or Detail */}
+            <div className="md:hidden h-full">
+              {selectedCardId ? (
+                <div className="h-full flex flex-col">
+                  <div className="bg-white border-b border-gray-200 p-4">
+                    <button
+                      onClick={() => setSelectedCardId(null)}
+                      className="text-blue-600 hover:text-blue-700 font-semibold"
+                    >
+                      ← グラフに戻る
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-hidden">
+                    <CardDetail
+                      card={selectedCard}
+                      onUpdateCard={updateCard}
+                      onDeleteCard={handleDeleteCard}
+                      onClose={() => setSelectedCardId(null)}
+                      onShowInGraph={handleShowInGraph}
+                      readOnly={readOnly}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <GraphView
+                  cards={cards}
+                  onNodeClick={(cardId) => setSelectedCardId(cardId)}
+                  initialCenterNodeId={graphCenterNodeId}
+                />
+              )}
+            </div>
+          </>
+        )}
       </main>
 
       {/* Card Form Modal */}
