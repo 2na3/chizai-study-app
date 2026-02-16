@@ -217,6 +217,7 @@ function App() {
                 onClearFilters={handleClearFilters}
               />
               <CardDetail
+                key={selectedCardId}
                 card={selectedCard}
                 onUpdateCard={updateCard}
                 onDeleteCard={handleDeleteCard}
@@ -239,6 +240,7 @@ function App() {
                   </div>
                   <div className="flex-1 overflow-hidden">
                     <CardDetail
+                      key={selectedCardId}
                       card={selectedCard}
                       onUpdateCard={updateCard}
                       onDeleteCard={handleDeleteCard}
@@ -275,6 +277,7 @@ function App() {
               </div>
               <div className="min-h-0">
                 <CardDetail
+                  key={selectedCardId}
                   card={selectedCard}
                   onUpdateCard={updateCard}
                   onDeleteCard={handleDeleteCard}
@@ -298,6 +301,7 @@ function App() {
                   </div>
                   <div className="flex-1 overflow-hidden">
                     <CardDetail
+                      key={selectedCardId}
                       card={selectedCard}
                       onUpdateCard={updateCard}
                       onDeleteCard={handleDeleteCard}
