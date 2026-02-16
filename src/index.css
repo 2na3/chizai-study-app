@@ -14,3 +14,26 @@ html, body, #root {
 * {
   min-width: 0;
 }
+
+/* Internal link styles (for [[Card Title]] syntax) */
+.internal-link {
+  color: #4f46e5; /* primary-600 */
+  text-decoration: none;
+  border-bottom: 1px solid #a5b4fc; /* primary-300 */
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.internal-link:hover {
+  color: #4338ca; /* primary-700 */
+  border-bottom-color: #6366f1; /* primary-500 */
+  background-color: #eef2ff; /* primary-50 */
+}
+
+.broken-link {
+  color: #ef4444; /* red-500 */
+  text-decoration: line-through;
+  opacity: 0.6;
+  cursor: help;
+}
