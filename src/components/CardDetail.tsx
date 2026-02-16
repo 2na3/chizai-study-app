@@ -173,8 +173,8 @@ export function CardDetail({
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-800">カード詳細</h2>
           <div className="flex gap-2">
-            {/* Show in Graph: Text Button (always visible) */}
-            {onShowInGraph && (
+            {/* Show in Graph: Text Button (visible only when not editing) */}
+            {onShowInGraph && !isEditing && (
               <button
                 onClick={() => onShowInGraph(card.id)}
                 className="px-4 py-2 text-accent-600 rounded-lg hover:bg-accent-50 transition-colors font-medium flex items-center gap-1"
