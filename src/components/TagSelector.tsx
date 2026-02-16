@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { TAG_CATEGORIES, getTagColorClasses } from '../constants/tags';
 
 interface TagSelectorProps {
@@ -15,6 +16,8 @@ export function TagSelector({
   onCustomTagAdd,
   onCustomTagRemove,
 }: TagSelectorProps) {
+  const [customTagInput, setCustomTagInput] = useState('');
+  const [isComposing, setIsComposing] = useState(false);
   return (
     <div className="space-y-4">
       {/* Predefined tag categories */}
@@ -82,16 +85,20 @@ export function TagSelector({
           <h4 className="text-sm font-semibold text-gray-700 mb-2">カスタムタグを追加</h4>
           <input
             type="text"
+            value={customTagInput}
+            onChange={(e) => setCustomTagInput(e.target.value)}
             placeholder="タグ名を入力してEnter"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={() => setIsComposing(false)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              // IME入力中のEnterは無視
+              if (e.key === 'Enter' && !isComposing) {
                 e.preventDefault();
-                const input = e.currentTarget;
-                const tag = input.value.trim();
-                if (tag && !selectedTags.includes(tag) && !customTags.includes(tag)) {
+                const tag = customTagInput.trim();
+                if (tag && !customTags.includes(tag)) {
                   onCustomTagAdd(tag);
-                  input.value = '';
+                  setCustomTagInput('');
                 }
               }
             }}
