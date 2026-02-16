@@ -16,9 +16,9 @@ export const TAG_CATEGORIES: Record<string, TagCategory> = {
     tags: ['要件', '手続', '期間', '効力', '侵害', '出願', '登録', '権利', '制限'],
   },
   level: {
-    name: '学習レベル',
+    name: 'カードの種類',
     color: 'yellow',
-    tags: ['重要', '基礎', '応用', '頻出'],
+    tags: ['条文', '単語', '解説'],
   },
 };
 
