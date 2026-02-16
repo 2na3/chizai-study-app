@@ -1,24 +1,34 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 import type { Card, CardUpdate } from '../types/card';
 import { TagSelector } from './TagSelector';
 import { getAllTags, getTagColorClasses, getCategoryForTag } from '../constants/tags';
+import {
+  parseInternalLinks,
+  detectInlineLinkCandidates,
+  autoInsertInternalLink,
+} from '../utils/internalLinks';
 
 interface CardDetailProps {
   card: Card | null;
+  allCards: Card[];
   onUpdateCard: (id: string, updates: CardUpdate) => void;
   onDeleteCard: (id: string) => void;
   onClose?: () => void;
   onShowInGraph?: (cardId: string) => void;
+  onSelectCard?: (cardId: string) => void;
   readOnly?: boolean;
 }
 
 export function CardDetail({
   card,
+  allCards,
   onUpdateCard,
   onDeleteCard,
   onClose,
   onShowInGraph,
+  onSelectCard,
   readOnly = false,
 }: CardDetailProps) {
   // Hooks must be called unconditionally before any early returns
@@ -36,6 +46,47 @@ export function CardDetail({
   const [customTags, setCustomTags] = useState<string[]>(customTagsList);
   const [references, setReferences] = useState(card?.references.join(', ') || '');
   const [relatedCardIds, setRelatedCardIds] = useState(card?.relatedCardIds.join(', ') || '');
+
+  // 内部リンクをパース（[[カードタイトル]]をHTMLリンクに変換）
+  const parsedContent = useMemo(() => {
+    return parseInternalLinks(card?.content || '', allCards);
+  }, [card?.content, allCards]);
+
+  const parsedPreviewContent = useMemo(() => {
+    return parseInternalLinks(content, allCards);
+  }, [content, allCards]);
+
+  // 内部リンクのクリック処理
+  const handleInternalLinkClick = (e: React.MouseEvent<HTMLDivElement>, inEditMode: boolean) => {
+    const target = e.target as HTMLElement;
+    if (target.classList.contains('internal-link')) {
+      e.preventDefault();
+      const cardId = target.getAttribute('data-card-id');
+      if (cardId && onSelectCard) {
+        if (inEditMode) {
+          // 編集モード中のプレビューは新しいタブで開く
+          const currentUrl = window.location.href.split('?')[0].split('#')[0];
+          const newUrl = `${currentUrl}?card=${cardId}`;
+          window.open(newUrl, '_blank');
+        } else {
+          // 閲覧モードは同じタブで遷移
+          onSelectCard(cardId);
+        }
+      }
+    }
+  };
+
+  // リンク候補を検出
+  const linkCandidates = useMemo(() => {
+    if (!isEditing || editTab !== 'edit') return [];
+    return detectInlineLinkCandidates(content, allCards, card?.id);
+  }, [content, allCards, card?.id, isEditing, editTab]);
+
+  // リンクを自動挿入
+  const handleInsertLink = (title: string) => {
+    const newContent = autoInsertInternalLink(content, title);
+    setContent(newContent);
+  };
 
   if (!card) {
     return (
@@ -232,23 +283,75 @@ export function CardDetail({
             </div>
             {isEditing ? (
               editTab === 'edit' ? (
-                <textarea
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  rows={10}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 font-mono font-normal"
-                  placeholder="内容を入力（Markdown形式）"
-                />
+                <>
+                  <textarea
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    rows={10}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 font-mono font-normal"
+                    placeholder="内容を入力（Markdown形式）"
+                  />
+
+                  {/* リンク候補セクション */}
+                  {linkCandidates.length > 0 && (
+                    <div className="mt-3 p-3 bg-primary-50 border border-primary-200 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <svg
+                          className="w-4 h-4 text-primary-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                          />
+                        </svg>
+                        <h4 className="text-sm font-semibold text-primary-900">
+                          リンク候補 (本文中に見つかりました)
+                        </h4>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {linkCandidates.map(({ card: candidateCard, occurrences }) => (
+                          <button
+                            key={candidateCard.id}
+                            type="button"
+                            onClick={() => handleInsertLink(candidateCard.title)}
+                            className="px-3 py-1.5 bg-white border border-primary-300 rounded-lg hover:bg-primary-100 transition-colors text-sm font-medium text-primary-700 flex items-center gap-1"
+                          >
+                            + [[{candidateCard.title}]]
+                            {occurrences > 1 && (
+                              <span className="text-xs text-primary-500">×{occurrences}</span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-primary-600 mt-2">
+                        クリックすると本文内の該当箇所に自動で [[ ]] が挿入されます
+                      </p>
+                    </div>
+                  )}
+                </>
               ) : (
-                <div className="w-full min-h-[250px] px-3 py-2 border border-gray-300 rounded-lg bg-gray-50">
+                <div
+                  className="w-full min-h-[250px] px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                  onClick={(e) => handleInternalLinkClick(e, true)}
+                >
                   <div className="prose prose-slate max-w-none prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-gray-900 prose-li:text-gray-900 prose-strong:text-gray-900 prose-code:text-primary-600 prose-code:bg-primary-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-50 prose-pre:border prose-pre:border-gray-200">
-                    <ReactMarkdown>{content || '*プレビューする内容がありません*'}</ReactMarkdown>
+                    <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                      {parsedPreviewContent || '*プレビューする内容がありません*'}
+                    </ReactMarkdown>
                   </div>
                 </div>
               )
             ) : (
-              <div className="prose prose-slate max-w-none prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-gray-900 prose-li:text-gray-900 prose-strong:text-gray-900 prose-code:text-primary-600 prose-code:bg-primary-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-50 prose-pre:border prose-pre:border-gray-200">
-                <ReactMarkdown>{card.content}</ReactMarkdown>
+              <div
+                className="prose prose-slate max-w-none prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:text-gray-900 prose-li:text-gray-900 prose-strong:text-gray-900 prose-code:text-primary-600 prose-code:bg-primary-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-50 prose-pre:border prose-pre:border-gray-200"
+                onClick={(e) => handleInternalLinkClick(e, false)}
+              >
+                <ReactMarkdown rehypePlugins={[rehypeRaw]}>{parsedContent}</ReactMarkdown>
               </div>
             )}
           </div>

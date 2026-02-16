@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCards } from './hooks/useCards';
 import { CardList } from './components/CardList';
 import { CardDetail } from './components/CardDetail';
@@ -20,6 +20,16 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [graphCenterNodeId, setGraphCenterNodeId] = useState<string | null>(null);
+
+  // URLパラメータからカードIDを読み取る（新しいタブで開いた場合）
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const cardId = params.get('card');
+    if (cardId && getCard(cardId)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedCardId(cardId);
+    }
+  }, [getCard]);
 
   const selectedCard = selectedCardId ? (getCard(selectedCardId) ?? null) : null;
 
@@ -219,9 +229,11 @@ function App() {
               <CardDetail
                 key={selectedCardId}
                 card={selectedCard}
+                allCards={cards}
                 onUpdateCard={updateCard}
                 onDeleteCard={handleDeleteCard}
                 onShowInGraph={handleShowInGraph}
+                onSelectCard={setSelectedCardId}
                 readOnly={readOnly}
               />
             </div>
@@ -242,10 +254,12 @@ function App() {
                     <CardDetail
                       key={selectedCardId}
                       card={selectedCard}
+                      allCards={cards}
                       onUpdateCard={updateCard}
                       onDeleteCard={handleDeleteCard}
                       onClose={() => setSelectedCardId(null)}
                       onShowInGraph={handleShowInGraph}
+                      onSelectCard={setSelectedCardId}
                       readOnly={readOnly}
                     />
                   </div>
@@ -279,9 +293,11 @@ function App() {
                 <CardDetail
                   key={selectedCardId}
                   card={selectedCard}
+                  allCards={cards}
                   onUpdateCard={updateCard}
                   onDeleteCard={handleDeleteCard}
                   onShowInGraph={handleShowInGraph}
+                  onSelectCard={setSelectedCardId}
                   readOnly={readOnly}
                 />
               </div>
@@ -303,10 +319,12 @@ function App() {
                     <CardDetail
                       key={selectedCardId}
                       card={selectedCard}
+                      allCards={cards}
                       onUpdateCard={updateCard}
                       onDeleteCard={handleDeleteCard}
                       onClose={() => setSelectedCardId(null)}
                       onShowInGraph={handleShowInGraph}
+                      onSelectCard={setSelectedCardId}
                       readOnly={readOnly}
                     />
                   </div>
