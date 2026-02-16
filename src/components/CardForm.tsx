@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import type { CardInput } from '../types/card';
 import { TagSelector } from './TagSelector';
@@ -18,7 +18,7 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
   const [references, setReferences] = useState('');
 
   // 入力内容があるかチェック
-  const hasInput = () => {
+  const hasInput = useCallback(() => {
     return (
       title.trim() !== '' ||
       content.trim() !== '' ||
@@ -26,10 +26,10 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
       customTags.length > 0 ||
       references.trim() !== ''
     );
-  };
+  }, [title, content, selectedTags, customTags, references]);
 
   // キャンセル処理（入力内容がある場合は確認）
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     if (hasInput()) {
       if (window.confirm('編集内容は保存されていません、破棄してもよろしいでしょうか？')) {
         onCancel();
@@ -37,7 +37,7 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
     } else {
       onCancel();
     }
-  };
+  }, [hasInput, onCancel]);
 
   // Handle Esc key to close modal
   useEffect(() => {
@@ -49,7 +49,7 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [title, content, selectedTags, customTags, references]);
+  }, [handleCancel]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -80,15 +80,13 @@ export function CardForm({ onSubmit, onCancel }: CardFormProps) {
 
   const handleCustomTagAdd = (tag: string) => {
     const allPredefinedTags = getAllTags();
-    if (!allPredefinedTags.includes(tag)) {
+    if (!allPredefinedTags.includes(tag) && !customTags.includes(tag)) {
       setCustomTags((prev) => [...prev, tag]);
-      setSelectedTags((prev) => [...prev, tag]);
     }
   };
 
   const handleCustomTagRemove = (tag: string) => {
     setCustomTags((prev) => prev.filter((t) => t !== tag));
-    setSelectedTags((prev) => prev.filter((t) => t !== tag));
   };
 
   // Handle click on backdrop to close modal

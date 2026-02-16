@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import type { Card, CardUpdate } from '../types/card';
 import { TagSelector } from './TagSelector';
@@ -21,33 +21,21 @@ export function CardDetail({
   onShowInGraph,
   readOnly = false,
 }: CardDetailProps) {
+  // Hooks must be called unconditionally before any early returns
+  // Separate predefined tags from custom tags (cardがnullの場合は空配列)
+  const allPredefinedTags = getAllTags();
+  const predefinedTags = card?.tags.filter((tag) => allPredefinedTags.includes(tag)) || [];
+  const customTagsList = card?.tags.filter((tag) => !allPredefinedTags.includes(tag)) || [];
+
+  // useState初期値でpropsから直接設定（App.tsxでkeyを設定しているため、カード切り替え時に再マウントされる）
   const [isEditing, setIsEditing] = useState(false);
   const [editTab, setEditTab] = useState<'edit' | 'preview'>('edit');
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [customTags, setCustomTags] = useState<string[]>([]);
-  const [references, setReferences] = useState('');
-  const [relatedCardIds, setRelatedCardIds] = useState('');
-
-  useEffect(() => {
-    if (card) {
-      setTitle(card.title);
-      setContent(card.content);
-
-      // Separate predefined tags from custom tags
-      const allPredefinedTags = getAllTags();
-      const predefinedTags = card.tags.filter((tag) => allPredefinedTags.includes(tag));
-      const customTagsList = card.tags.filter((tag) => !allPredefinedTags.includes(tag));
-
-      setSelectedTags(predefinedTags);
-      setCustomTags(customTagsList);
-      setReferences(card.references.join(', '));
-      setRelatedCardIds(card.relatedCardIds.join(', '));
-      setIsEditing(false);
-      setEditTab('edit');
-    }
-  }, [card]);
+  const [title, setTitle] = useState(card?.title || '');
+  const [content, setContent] = useState(card?.content || '');
+  const [selectedTags, setSelectedTags] = useState<string[]>(predefinedTags);
+  const [customTags, setCustomTags] = useState<string[]>(customTagsList);
+  const [references, setReferences] = useState(card?.references.join(', ') || '');
+  const [relatedCardIds, setRelatedCardIds] = useState(card?.relatedCardIds.join(', ') || '');
 
   if (!card) {
     return (
@@ -78,15 +66,13 @@ export function CardDetail({
 
   const handleCustomTagAdd = (tag: string) => {
     const allPredefinedTags = getAllTags();
-    if (!allPredefinedTags.includes(tag)) {
+    if (!allPredefinedTags.includes(tag) && !customTags.includes(tag)) {
       setCustomTags((prev) => [...prev, tag]);
-      setSelectedTags((prev) => [...prev, tag]);
     }
   };
 
   const handleCustomTagRemove = (tag: string) => {
     setCustomTags((prev) => prev.filter((t) => t !== tag));
-    setSelectedTags((prev) => prev.filter((t) => t !== tag));
   };
 
   // 編集内容に変更があるかチェック
@@ -106,16 +92,11 @@ export function CardDetail({
   const handleCancel = () => {
     if (hasChanges()) {
       if (window.confirm('編集内容は保存されていません、破棄してもよろしいでしょうか')) {
+        // Reset to original values (already defined at component top)
         setTitle(card.title);
         setContent(card.content);
-
-        // Reset tags to original
-        const allPredefinedTags = getAllTags();
-        const predefinedTags = card.tags.filter((tag) => allPredefinedTags.includes(tag));
-        const customTagsList = card.tags.filter((tag) => !allPredefinedTags.includes(tag));
         setSelectedTags(predefinedTags);
         setCustomTags(customTagsList);
-
         setReferences(card.references.join(', '));
         setRelatedCardIds(card.relatedCardIds.join(', '));
         setIsEditing(false);
