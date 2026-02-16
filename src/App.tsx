@@ -349,6 +349,8 @@ function App() {
       {/* Data Management Modal */}
       {isDataManagementOpen && (
         <DataManagement
+          cards={cards}
+          onUpdateCard={updateCard}
           onClose={() => setIsDataManagementOpen(false)}
           onImportComplete={handleImportComplete}
         />
