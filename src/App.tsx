@@ -144,7 +144,7 @@ function App() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="タイトルやタグで検索..."
-                  className="flex-1 min-w-0 max-w-96 px-3 py-2 rounded-md bg-white text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+                  className="flex-1 min-w-0 max-w-96 px-3 py-2 rounded-full bg-white text-gray-900 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 />
               )}
               {/* View Toggle Buttons */}
